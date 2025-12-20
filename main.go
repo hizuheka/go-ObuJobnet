@@ -32,8 +32,11 @@ type JobNet struct {
 	Data       map[string]string
 }
 
-// 優先して表示する列名のリスト
+// 優先して「先頭」に表示する列
 var priorityHeaders = []string{"jobnetname", "jobnetcomment"}
+
+// 優先して「末尾（右端）」に表示する列
+var tailHeaders = []string{"jobschprintr"}
 
 // main はエントリーポイントです。依存性の注入や終了コードの制御のみを行います。
 func main() {
@@ -121,35 +124,48 @@ func processDirectory(root string) ([]JobNet, []string, error) {
 	return jobNets, sortedHeaders, nil
 }
 
-// sortHeaders は指定されたルール（優先項目 -> アルファベット順）でソートします
+// sortHeaders は指定されたルール（先頭固定 -> その他(昇順) -> 末尾固定）でソートします
 func sortHeaders(headerSet map[string]struct{}) []string {
-	var result []string
+	var headList []string
+	var tailList []string
+	var otherList []string
+
 	seen := make(map[string]bool)
 
-	// 1. 優先項目を追加
+	// 1. 先頭固定カラムの抽出
 	for _, h := range priorityHeaders {
 		if _, exists := headerSet[h]; exists {
-			result = append(result, h)
+			headList = append(headList, h)
 			seen[h] = true
 		}
 	}
 
-	// 2. その他の項目を収集
-	var others []string
-	for h := range headerSet {
-		if !seen[h] {
-			others = append(others, h)
+	// 2. 末尾固定カラムの抽出
+	for _, h := range tailHeaders {
+		if _, exists := headerSet[h]; exists {
+			tailList = append(tailList, h)
+			seen[h] = true
 		}
 	}
 
-	// 3. その他の項目をアルファベット順にソート
-	sort.Strings(others)
+	// 3. その他のカラムを抽出
+	for h := range headerSet {
+		if !seen[h] {
+			otherList = append(otherList, h)
+		}
+	}
 
-	// 4. 結合
-	result = append(result, others...)
+	// 4. その他のカラムをアルファベット順にソート
+	sort.Strings(otherList)
+
+	// 5. 全てを結合 (Head + Others + Tail)
+	result := make([]string, 0, len(headerSet))
+	result = append(result, headList...)
+	result = append(result, otherList...)
+	result = append(result, tailList...)
+
 	return result
 }
-
 func parseJobNetFile(path string) (*JobNet, []string, error) {
 	f, err := os.Open(path)
 	if err != nil {
