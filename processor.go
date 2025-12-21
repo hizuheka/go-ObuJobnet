@@ -23,7 +23,7 @@ type Processor struct {
 }
 
 // priorityHeaders: CSV出力時に優先して「左端（先頭）」に配置する列名
-var priorityHeaders = []string{"jobnetname", "jobnetcomment"}
+var priorityHeaders = []string{"foldername", "jobnetname", "jobnetcomment"}
 
 // tailHeaders: CSV出力時に優先して「右端（末尾）」に配置する列名
 var tailHeaders = []string{"jobschprintr"}
@@ -93,6 +93,9 @@ func (p *Processor) processDirectory() ([]JobNet, []string, error) {
 			for _, h := range headers {
 				headerSet[h] = struct{}{}
 			}
+
+			// "foldername" をヘッダーセットに登録
+			headerSet["foldername"] = struct{}{}
 		}
 		return nil
 	})
@@ -144,7 +147,7 @@ func (p *Processor) parseJobNetFile(path string) (*JobNet, []string, error) {
 }
 
 // parseCSVBlock は抽出されたヘッダー行とデータ行をCSVとしてパースし、Map構造に変換します。
-func (p *Processor) parseCSVBlock(filename, headerStr, dataStr string) (*JobNet, []string, error) {
+func (p *Processor) parseCSVBlock(path, headerStr, dataStr string) (*JobNet, []string, error) {
 	// ヘッダー行のパース
 	hr := csv.NewReader(strings.NewReader(headerStr))
 	headers, err := hr.Read()
@@ -164,6 +167,18 @@ func (p *Processor) parseCSVBlock(filename, headerStr, dataStr string) (*JobNet,
 
 	// ヘッダーと値をMapに紐付け
 	dataMap := make(map[string]string)
+
+	// ---------------------------------------------------------
+	// 親フォルダ名の取得ロジック
+	// ---------------------------------------------------------
+	// filepath.Dir で親ディレクトリのパスを取得 (例: "C:\Data\SystemA")
+	dirPath := filepath.Dir(path)
+	// filepath.Base でそのパスの末尾（フォルダ名）を取得 (例: "SystemA")
+	folderName := filepath.Base(dirPath)
+
+	// マップに登録（キーは "foldername"）
+	dataMap["foldername"] = folderName
+
 	for i, h := range headers {
 		val := ""
 		// 値が存在する場合のみ取得（インデックス範囲外アクセス防止）
@@ -178,7 +193,11 @@ func (p *Processor) parseCSVBlock(filename, headerStr, dataStr string) (*JobNet,
 
 		dataMap[h] = val
 	}
-	return &JobNet{SourceFile: filename, Data: dataMap}, headers, nil
+
+	// headers配列には "foldername" が含まれていないため、
+	// ここでは元のCSVにあるヘッダーだけを返します。
+	// "foldername" は processDirectory 側で sortHeaders 時に考慮されます。
+	return &JobNet{SourceFile: path, Data: dataMap}, headers, nil
 }
 
 // sortHeaders は集約された全ての項目名を、以下の優先順位で並び替えます。
