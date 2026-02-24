@@ -18,6 +18,7 @@ func main() {
 
 	// 2. アプリケーション固有のサブコマンドを登録
 	subcommands.Register(&ConvertCmd{}, "")
+	subcommands.Register(&AlignCmd{}, "")
 
 	// 3. フラグのパースとコマンドの実行
 	flag.Parse()
