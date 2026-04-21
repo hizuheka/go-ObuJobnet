@@ -85,8 +85,8 @@ func (p *AlignCmd) run() error {
 	}
 
 	// 指定項目をプログラム内にハードコーディング（要件に合わせて書き換えてください）
-	targetNetCols := []string{"jobnetname", "jobnetcomment", "intervalstart", "msgonly", "holidayshift", "execattr", "messagename", "messagemode", "job", "operate", "noexecution", "starttime", "execdaymode", "holidaycalendar", "monthlyweek", "monthlyweek", "monthlyweek", "monthlyweek", "monthlyweek", "monthlyweek", "monthlyweek", "jobschprintr"}
-	targetJobCols := []string{"jobname", "jobnumber", "jobparam", "jobname_jes", "jobcomment", "directory", "normallimit", "limittime", "iconposition", "operate", "pre_job", "pre_job_endcode", "jobicon"}
+	targetNetCols := []string{"jobnetname", "jobnetcomment", "intervalstart", "msgonly", "holidayshift", "execattr", "messagename", "messagemode", "job", "operate", "noexecution", "starttime", "holidaycalendar", "monthlyweek", "monthlyweek", "monthlyweek", "monthlyweek", "monthlyweek", "monthlyweek", "monthlyweek", "jobschprintr"}
+	targetJobCols := []string{"jobname", "jobnumber", "jobparam", "jobname_jes", "jobcomment", "directory", "normallimit", "limittime", "iconposition", "operate", "pre_job", "pre_job_endcode", "jobicon", "execdaymode"}
 
 	// パース用の状態遷移（ステートマシン）
 	type State int
