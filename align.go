@@ -85,7 +85,7 @@ func (p *AlignCmd) run() error {
 	}
 
 	// 指定項目をプログラム内にハードコーディング（要件に合わせて書き換えてください）
-	targetNetCols := []string{"jobnetname", "jobnetcomment", "intervalstart", "msgonly", "holidayshift", "execattr", "messagename", "messagemode", "job", "operate", "noexecution"}
+	targetNetCols := []string{"jobnetname", "jobnetcomment", "intervalstart", "msgonly", "holidayshift", "execattr", "messagename", "messagemode", "job", "operate", "noexecution", "jobschprintr", "monthlyweek", "monthlyweek", "monthlyweek", "monthlyweek", "monthlyweek", "monthlyweek", "monthlyweek", "holidaycalendar"}
 	targetJobCols := []string{"jobname", "jobnumber", "jobparam", "jobname_jes", "jobcomment", "directory", "normallimit", "limittime", "iconposition", "operate", "pre_job", "pre_job_endcode", "jobicon"}
 
 	// パース用の状態遷移（ステートマシン）
